@@ -9,11 +9,8 @@ from character import Character
 from character import Compass
 from obstacle import Landmark
 from obstacle import Wall
-from weapon import weapon
 from item import Location
 import random
-import armor
-import data
 import sys
 
 def main():
@@ -284,16 +281,6 @@ def doMove(you, obs, *command):
 def doCompass(you, *extras):
 	print("You are facing " + str(you.compass) + ".")
 	return True
-	
-def generateItems():
-	retItems = [armor.helm(), armor.boots(), armor.gauntlets(), 
-				armor.legplates(), armor.shoulderplates(), 
-				armor.breastplate()]
-	for i in retItems:
-		xVal = random.randint(1, 51)
-		yVal = random.randint(1, 41)
-		i.loc = Location(xVal, yVal)
-	return retItems
-	
+
 main()
 
