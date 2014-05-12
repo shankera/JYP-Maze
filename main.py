@@ -10,7 +10,9 @@ from character import Compass
 from obstacle import Landmark
 from obstacle import Wall
 from item import Location
+import maze
 import random
+import array
 import sys
 
 def main():
@@ -19,13 +21,27 @@ def main():
 		valid = True
 		
 		#Generates player at default location facing north
-		you = Character(Location(25,35), Compass(0))
-		obs = generateObstacles()			#벽들 창조해
-		landmarks = generateLandmarks()		#랜그마크  객체들 창조해
+		you = Character(Location(1,1), Compass(0))		
+		try:
+			var = raw_input("Would you like to use the default size? (Y/N): ")
+		except NameError:
+			var = input("Would you like to use the default size? (Y/N): ")
+		if var == "y" or var == "Y":
+			width = 50
+			height = 40
+		else:
+			try:
+				width = raw_input("Enter Width: ")
+				height = raw_input("Enter Height: ")
+			except NameError:
+				width = input("Enter Width: ")
+				height = input("Enter Height: ")
+				
+		obs = generateObstacles(width, height)			#벽들 창조해
+		landmarks = generateLandmarks(width, height)		#랜그마크  객체들 창조해
 		for x in range(len(landmarks)-1):
 			for y in range(len(landmarks[x])-1):
 				obs[x][y] = landmarks[x][y]
-		items = generateItems()				#목록 창조해
 		
 		while valid:
 			try:
@@ -74,56 +90,26 @@ def doLoc(you, *extras):
 
 #creates landmark objects based on the location values collected
 #from the data.py file
-def generateLandmarks():
-	landmarks = [[0 for x in range(41)] for x in range(51)] 
+def generateLandmarks(w, h):
+	#find the size that the maze matrix needs to be since it doesn't contain
+    #walls, but connections.
 	
-	#adds boulder coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.boulder]:
-		landmarks[y.loc.x][y.loc.y] = 'boulder'
-		
-	#adds first tree coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.tree1]:
-		landmarks[y.loc.x][y.loc.y] = 'dead tree'
-		
-	#adds second tree coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.tree2]:
-		landmarks[y.loc.x][y.loc.y] = 'plagued tree'
-		
-	#adds third tree coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.tree3]:
-		landmarks[y.loc.x][y.loc.y] = 'charred tree'
-		
-	#adds fence coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.fence]:
-		landmarks[y.loc.x][y.loc.y] = 'broken fence gate'
-		
-	#adds outhouse coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.outhouse]:
-		landmarks[y.loc.x][y.loc.y] = 'smelly boarded-up outhouse'
-		
-	#adds chest coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.chest]:
-		landmarks[y.loc.x][y.loc.y] = 'mysterious locked chest'
-		
-	#adds cow coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.cow]:
-		landmarks[y.loc.x][y.loc.y] = 'very stubborn cow'
-		
-	#adds house coordinates to the array
-	for y in [Landmark(Location(t[0], t[1]), 'boulder') for t in data.house]:
-		landmarks[y.loc.x][y.loc.y] = 'sinister looking house'
-	
-	return landmarks
-		
+    width = int(w)
+    height = int(h)
+    x = maze.print_maze(maze.make_maze(width,height),width,height)
+    return x
+
 #creates walls between the predetermined boundaries
-def generateObstacles():
-	obs = [[0 for x in range(41)] for x in range(51)] 
-	for x in range (0, 50):
+def generateObstacles(w, h):
+	width = int(w)
+	height = int(h)
+	obs = [[0 for x in range(height + 1)] for x in range(width + 1)] 
+	for x in range (0, width):
 		obs[x][0] = 'wall'	
-		obs[x][40] = 'wall'
-	for y in range(0, 40):
+		obs[x][height] = 'wall'
+	for y in range(0, height):
 		obs[0][y] = 'wall'
-		obs[50][y] = 'wall'
+		obs[width][y] = 'wall'
 	return obs
 
 #prints lines from help file 
@@ -141,6 +127,7 @@ def doLook(you, obs, command, *extras):
 	direction = 0
 	#there is something after look
 	if len(extras) > 0:
+		encountered = 0
 		#if told to look left
 		if extras[0] == 'left':	
 			direction = 1
@@ -179,7 +166,7 @@ def doLook(you, obs, command, *extras):
 			elif you.compass.direction == 3:
 				if obs[you.loc.x][you.loc.y-1] != '':
 					encountered = obs[you.loc.x][you.loc.y-1]	
-					
+	
 	if encountered != 0:
 		if direction == 1:
 			print("There is a",encountered,"to the left of you.")
@@ -255,12 +242,13 @@ def doMove(you, obs, *command):
 		elif you.compass.direction == 3:
 			newloc = Location(you.loc.x - 1, you.loc.y)
 	
-		if obs[newloc.x][newloc.y] != 0:
+		if obs[newloc.x][newloc.y] != 0 and obs[newloc.x][newloc.y] != "" :
 			encountered = obs[newloc.x][newloc.y]
 			if x > 1:
 				validLoc = 2
 			else:
 				validLoc = 1
+				
 			canMove = False
 				
 		if counter == x+1:
@@ -268,10 +256,10 @@ def doMove(you, obs, *command):
 		if canMove:
 			you.loc = newloc
 	
-	if validLoc == 2:
+	if validLoc == 2 :
 		print("You walked %d and encountered a %s" % (counter-1, encountered))
-		
-	if validLoc == 1:
+	
+	elif validLoc == 1:
 		print("There is a %s in your way" % (encountered))
 	elif validLoc == 3:
 		print("You must specify a direction! Only forward works!")
