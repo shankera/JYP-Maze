@@ -21,7 +21,7 @@ def main():
 		valid = True
 		
 		#Generates player at default location facing north
-		you = Character(Location(1,1), Compass(0))		
+		you = Character(Location(1,1), Compass(2))		
 		try:
 			var = raw_input("Would you like to use the default size? (Y/N): ")
 		except NameError:
@@ -126,8 +126,8 @@ def doHelp(*extras):
 def doLook(you, obs, command, *extras):
 	direction = 0
 	#there is something after look
+	encountered = 0
 	if len(extras) > 0:
-		encountered = 0
 		#if told to look left
 		if extras[0] == 'left':	
 			direction = 1
@@ -166,31 +166,53 @@ def doLook(you, obs, command, *extras):
 			elif you.compass.direction == 3:
 				if obs[you.loc.x][you.loc.y-1] != '':
 					encountered = obs[you.loc.x][you.loc.y-1]	
+	else:
+		direction = 3
+		#North
+		if you.compass.direction == 0:
+			if obs[you.loc.x][you.loc.y-1] != '':
+				encountered = obs[you.loc.x][you.loc.y-1]
+		#East
+		elif you.compass.direction == 1:
+			if obs[you.loc.x+1][you.loc.y] != '':
+				encountered = obs[you.loc.x+1][you.loc.y]
+		#South
+		elif you.compass.direction == 2:
+			if obs[you.loc.x][you.loc.y+1] != '':
+				encountered = obs[you.loc.x][you.loc.y+1]
+		#West
+		elif you.compass.direction == 3:
+			if obs[you.loc.x-1][you.loc.y] != '':
+				encountered = obs[you.loc.x-1][you.loc.y]
 	
 	if encountered != 0:
 		if direction == 1:
 			print("There is a",encountered,"to the left of you.")
-		else:
+		elif direction == 2:
 			print("There is a",encountered,"to the right of you.")
+		else:
+			print("There is a",encountered,"in front of you.")
 	else:
 		if direction == 1:
 			print("There is nothing to the left of you.")
-		else:
+		elif direction == 2:
 			print("There is nothing to the right of you.")
+		else:
+			print("There is nothing in front of you.")
 		
 	return True
 			
 def doQuit(*extras):
 	return False
 	
-def doTurn(you, obs, command, way, *extras):
-	if way == '':
+def doTurn(you, obs, command, *extras):
+	if len(extras) == 0:
 		print("You must specify a direction.")
-	elif way == 'left':
+	elif extras[0]== 'left':
 		you.compass.direction -= 1
-	elif way == 'right':
+	elif extras[0] == 'right':
 		you.compass.direction += 1
-	elif way == 'around':
+	elif extras[0] == 'around':
 		you.compass.direction += 2
 	else:
 		print("You can't turn that way.")
