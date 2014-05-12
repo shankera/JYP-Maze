@@ -1,3 +1,6 @@
+# This was originally sourced at https://github.com/dledlow/MazeGenerator/blob/master/maze.py
+# I modified it for use in this lab
+# 
 import random
 import sys
 
@@ -6,7 +9,6 @@ class MazePiece:
     def __init__(self,x,y):
         self.x = x
         self.y = y
-        self.shortest_path = float("infinity")
         #Empty lists will denote a wall, and non-empty lists will denote 
         #a corridor.     
         self.connections = []
@@ -14,50 +16,6 @@ class MazePiece:
        # return "%d, %d" % (self.x, self.y)
     def __str__(self):
         return str(len(self.connections))
-
-#print the number of connections for each MazePiece
-def print_maze_connections(m):
-    for i in range(len(m[0])):
-        for x in m:
-            if len(x[i].connections):
-                print(x[i], end = " ")
-            else:
-                print("W", end = " ")
-        print()
-    print()
-
-#return a list of coordinates along which the shortest path through maze m lies.
-def shortest_path(m, start, target):
-    #BFS
-    visited = [start]
-    fronteir = start.connections[:]
-    for i in fronteir:
-        i.shortest_path = 1
-            
-    start.shortest_path = 0
-    curr = start
-    
-    #tell all the pieces what their shortest path is
-    while curr != target and fronteir != []:
-        visited.append(curr)
-        curr = fronteir.pop(0)
-        for i in curr.connections:
-            if (curr.shortest_path+1 < i.shortest_path):
-                i.shortest_path = curr.shortest_path+1
-            if (i not in visited and i not in fronteir):
-                fronteir.append(i)
-    
-    #follow and record the path from the target back to the start
-    path = [(target.x,target.y)]
-    curr = target
-    while curr != start:
-        for i in curr.connections:
-            if (i.shortest_path == curr.shortest_path-1):
-                curr = i
-        path.append((curr.x,curr.y))
-    return path
-            
-        
 
 #print the properly formatted maze, optionally with the shortest path through it
 def print_maze(m,w,h):
@@ -174,5 +132,4 @@ if __name__ == "__main__":
     h = int(input("Please enter a height: "))
     
     m = make_maze(w,h)
-    #print_maze_connections(m)
     print_maze(m,w,h)
