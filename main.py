@@ -17,7 +17,6 @@ import sys
 
 def main():
 	try:
-		print("Type 'help' for a list of commands!")
 		valid = True
 		
 		#Generates player at default location facing north
@@ -43,6 +42,7 @@ def main():
 			for y in range(len(landmarks[x])-1):
 				obs[x][y] = landmarks[x][y]
 		
+		print("Type 'help' for a list of commands!")
 		while valid:
 			try:
 				var = raw_input("What would you like to do? : ")
@@ -246,9 +246,6 @@ def doMove(you, obs, *command):
 			if command[1] != "forward":
 				validLoc = 3
 				x = 0
-		else:
-			validLoc = 3
-			x = 0
 			
 		#creates a location object based on the compass, one spot away
 		#North

@@ -124,12 +124,3 @@ def make_maze(width, height):
 
     return m
     
-if __name__ == "__main__":
-    
-    #w = 70
-    #h = 70
-    w = int(input("Please enter a width: "))
-    h = int(input("Please enter a height: "))
-    
-    m = make_maze(w,h)
-    print_maze(m,w,h)
